@@ -177,4 +177,35 @@ update_key_state(state_t* const st)
   st->key[1] = t1;
 }
 
+// GIFT-128 round function, consisting of three sequential steps
+//
+// i) substitute cells
+// ii) permute bits
+// iii) add round keys and round constants
+//
+// See section 2.4.1 of GIFT-COFB specification
+// https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+inline static void
+round(state_t* const st, const size_t r_idx)
+{
+  sub_cells(st);
+  perm_bits(st);
+  add_round_keys(st, r_idx);
+
+  update_key_state(st);
+}
+
+// GIFT-128 substitution permutation network ( SPN ) block cipher, operating on
+// initialized cipher/ key state, by applying 40 iterative rounds of GIFT-128
+//
+// See section 2.4.1 of GIFT-COFB specification
+// https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+inline static void
+permute(state_t* const st)
+{
+  for (size_t i = 0; i < ROUNDS; i++) {
+    round(st, i);
+  }
+}
+
 }
