@@ -12,33 +12,29 @@ namespace gift {
 // GIFT-COFB specification
 constexpr size_t ROUNDS = 40;
 
-// 32 -bit bit permutation, applied to S0 word of cipher state, as listed in
-// table 2.2 of GIFT-COFB specification
-constexpr uint32_t BIT_PERM_S0[32] = { 0, 4, 8,  12, 16, 20, 24, 28,
-                                       3, 7, 11, 15, 19, 23, 27, 31,
-                                       2, 6, 10, 14, 18, 22, 26, 30,
-                                       1, 5, 9,  13, 17, 21, 25, 29 };
+// Only bit 7 of 32 -bit word set
+constexpr uint32_t B7 = 0b10000000u;
 
-// 32 -bit bit permutation, applied to S1 word of cipher state, as listed in
-// table 2.2 of GIFT-COFB specification
-constexpr uint32_t BIT_PERM_S1[32] = { 1, 5, 9,  13, 17, 21, 25, 29,
-                                       0, 4, 8,  12, 16, 20, 24, 28,
-                                       3, 7, 11, 15, 19, 23, 27, 31,
-                                       2, 6, 10, 14, 18, 22, 26, 30 };
+// Only bit 6 of 32 -bit word set
+constexpr uint32_t B6 = 0b01000000u;
 
-// 32 -bit bit permutation, applied to S2 word of cipher state, as listed in
-// table 2.2 of GIFT-COFB specification
-constexpr uint32_t BIT_PERM_S2[32] = { 2, 6, 10, 14, 18, 22, 26, 30,
-                                       1, 5, 9,  13, 17, 21, 25, 29,
-                                       0, 4, 8,  12, 16, 20, 24, 28,
-                                       3, 7, 11, 15, 19, 23, 27, 31 };
+// Only bit 5 of 32 -bit word set
+constexpr uint32_t B5 = 0b00100000u;
 
-// 32 -bit bit permutation, applied to S3 word of cipher state, as listed in
-// table 2.2 of GIFT-COFB specification
-constexpr uint32_t BIT_PERM_S3[32] = { 3, 7, 11, 15, 19, 23, 27, 31,
-                                       2, 6, 10, 14, 18, 22, 26, 30,
-                                       1, 5, 9,  13, 17, 21, 25, 29,
-                                       0, 4, 8,  12, 16, 20, 24, 28 };
+// Only bit 4 of 32 -bit word set
+constexpr uint32_t B4 = 0b00010000u;
+
+// Only bit 3 of 32 -bit word set
+constexpr uint32_t B3 = 0b00001000u;
+
+// Only bit 2 of 32 -bit word set
+constexpr uint32_t B2 = 0b00000100u;
+
+// Only bit 1 of 32 -bit word set
+constexpr uint32_t B1 = 0b00000010u;
+
+// Only bit 0 of 32 -bit word set
+constexpr uint32_t B0 = 0b00000001u;
 
 // GIFT-128 round constants which are generated from 6 -bit affine linear
 // feedback shift register ( LFSR ), see table in page 7 of GIFT-COFB
@@ -111,18 +107,100 @@ sub_cells(state_t* const st)
   std::swap(st->cipher[0], st->cipher[3]);
 }
 
-// Permutes 32 -bits of a word of cipher state of GIFT-128 block cipher (
-// invoked as part of PermBits step )
+// 32 -bit bit permutation, applied to S0 word of GIFT-128 cipher state, as
+// listed in table 2.2 of GIFT-COFB specification
 inline static uint32_t
-perm_word(const uint32_t w, const uint32_t* const bit_perm)
+perm_word0(const uint32_t w)
 {
-  uint32_t tmp = 0u;
+  const uint32_t t0 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
+                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
+                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
 
-  for (size_t i = 0; i < 32; i++) {
-    tmp |= ((w >> bit_perm[i]) & 0b1u) << i;
-  }
+  const uint32_t t1 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
+                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
+                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
 
-  return tmp;
+  const uint32_t t2 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
+                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
+                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
+
+  const uint32_t t3 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
+                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
+                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
+
+  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
+}
+
+// 32 -bit bit permutation, applied to S1 word of GIFT-128 cipher state, as
+// listed in table 2.2 of GIFT-COFB specification
+inline static uint32_t
+perm_word1(const uint32_t w)
+{
+  const uint32_t t0 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
+                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
+                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
+
+  const uint32_t t1 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
+                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
+                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
+
+  const uint32_t t2 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
+                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
+                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
+
+  const uint32_t t3 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
+                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
+                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
+
+  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
+}
+
+// 32 -bit bit permutation, applied to S2 word of GIFT-128 cipher state, as
+// listed in table 2.2 of GIFT-COFB specification
+inline static uint32_t
+perm_word2(const uint32_t w)
+{
+  const uint32_t t0 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
+                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
+                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
+
+  const uint32_t t1 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
+                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
+                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
+
+  const uint32_t t2 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
+                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
+                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
+
+  const uint32_t t3 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
+                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
+                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
+
+  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
+}
+
+// 32 -bit bit permutation, applied to S3 word of GIFT-128 cipher state, as
+// listed in table 2.2 of GIFT-COFB specification
+inline static uint32_t
+perm_word3(const uint32_t w)
+{
+  const uint32_t t0 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
+                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
+                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
+
+  const uint32_t t1 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
+                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
+                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
+
+  const uint32_t t2 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
+                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
+                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
+
+  const uint32_t t3 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
+                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
+                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
+
+  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
 }
 
 // Four different 32 -bit bit permutations are independently applied on each
@@ -133,10 +211,10 @@ perm_word(const uint32_t w, const uint32_t* const bit_perm)
 inline static void
 perm_bits(state_t* const st)
 {
-  st->cipher[0] = perm_word(st->cipher[0], BIT_PERM_S0);
-  st->cipher[1] = perm_word(st->cipher[1], BIT_PERM_S1);
-  st->cipher[2] = perm_word(st->cipher[2], BIT_PERM_S2);
-  st->cipher[3] = perm_word(st->cipher[3], BIT_PERM_S3);
+  st->cipher[0] = perm_word0(st->cipher[0]);
+  st->cipher[1] = perm_word1(st->cipher[1]);
+  st->cipher[2] = perm_word2(st->cipher[2]);
+  st->cipher[3] = perm_word3(st->cipher[3]);
 }
 
 // Adds round keys and round constants to cipher state of GIFT-128 block cipher
