@@ -6,6 +6,10 @@
 // GIFT-128 Block Cipher
 namespace gift {
 
+// GIFT-128 is a 40 -round iterative block cipher, see bottom of page 4 of
+// GIFT-COFB specification
+constexpr size_t ROUNDS = 40;
+
 // 32 -bit bit permutation, applied to S0 word of cipher state, as listed in
 // table 2.2 of GIFT-COFB specification
 constexpr uint32_t BIT_PERM_S0[32] = { 0, 4, 8,  12, 16, 20, 24, 28,
@@ -33,6 +37,17 @@ constexpr uint32_t BIT_PERM_S3[32] = { 3, 7, 11, 15, 19, 23, 27, 31,
                                        2, 6, 10, 14, 18, 22, 26, 30,
                                        1, 5, 9,  13, 17, 21, 25, 29,
                                        0, 4, 8,  12, 16, 20, 24, 28 };
+
+// GIFT-128 round constants which are generated from 6 -bit affine linear
+// feedback shift register ( LFSR ), see table in page 7 of GIFT-COFB
+// specification
+// https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+constexpr uint8_t RC[ROUNDS] = {
+  0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3E, 0x3D, 0x3B, 0x37, 0x2F,
+  0x1E, 0x3C, 0x39, 0x33, 0x27, 0x0E, 0x1D, 0x3A, 0x35, 0x2B,
+  0x16, 0x2C, 0x18, 0x30, 0x21, 0x02, 0x05, 0x0B, 0x17, 0x2E,
+  0x1C, 0x38, 0x31, 0x23, 0x06, 0x0D, 0x1B, 0x36, 0x2D, 0x1A
+};
 
 // GIFT-128 block cipher state, as defined in section 2.4.1 of GIFT-COFB
 // specification ( see page 5 )
@@ -73,7 +88,7 @@ initialize(state_t* const __restrict st,        // GIFT-128 block cipher state
 // page 5 of GIFT-COFB specification
 // https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
 inline static void
-subcells(state_t* const st)
+sub_cells(state_t* const st)
 {
   const uint32_t t0 = st->cipher[0] & st->cipher[2];
   st->cipher[1] ^= t0;
@@ -97,7 +112,7 @@ subcells(state_t* const st)
 // Permutes 32 -bits of a word of cipher state of GIFT-128 block cipher (
 // invoked as part of PermBits step )
 inline static uint32_t
-permword(const uint32_t w, const uint32_t* const bit_perm)
+perm_word(const uint32_t w, const uint32_t* const bit_perm)
 {
   uint32_t tmp = 0u;
 
@@ -114,12 +129,33 @@ permword(const uint32_t w, const uint32_t* const bit_perm)
 // See PermBits specification defined in page 6 of GIFT-COFB specification
 // https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
 inline static void
-permbits(state_t* const st)
+perm_bits(state_t* const st)
 {
-  st->cipher[0] = permword(st->cipher[0], BIT_PERM_S0);
-  st->cipher[1] = permword(st->cipher[1], BIT_PERM_S1);
-  st->cipher[2] = permword(st->cipher[2], BIT_PERM_S2);
-  st->cipher[3] = permword(st->cipher[3], BIT_PERM_S3);
+  st->cipher[0] = perm_word(st->cipher[0], BIT_PERM_S0);
+  st->cipher[1] = perm_word(st->cipher[1], BIT_PERM_S1);
+  st->cipher[2] = perm_word(st->cipher[2], BIT_PERM_S2);
+  st->cipher[3] = perm_word(st->cipher[3], BIT_PERM_S3);
+}
+
+// Adds round keys and round constants to cipher state of GIFT-128 block cipher
+//
+// Note, round keys are extracted from key state of block cipher
+//
+// See page 6 of GIFT-COFB specification
+// https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+inline static void
+add_round_keys(state_t* const st, const size_t r_idx)
+{
+  const uint32_t u = (static_cast<uint32_t>(st->key[2]) << 16) |
+                     (static_cast<uint32_t>(st->key[3]) << 0);
+
+  const uint32_t v = (static_cast<uint32_t>(st->key[6]) << 16) |
+                     (static_cast<uint32_t>(st->key[7]) << 0);
+
+  st->cipher[2] ^= u;
+  st->cipher[1] ^= v;
+
+  st->cipher[3] ^= (1u << 31) | static_cast<uint32_t>(RC[r_idx]);
 }
 
 }
