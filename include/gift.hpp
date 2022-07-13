@@ -1,7 +1,9 @@
 #pragma once
 #include <algorithm>
+#include <bit>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 
 // GIFT-128 Block Cipher
 namespace gift {
@@ -156,6 +158,23 @@ add_round_keys(state_t* const st, const size_t r_idx)
   st->cipher[1] ^= v;
 
   st->cipher[3] ^= (1u << 31) | static_cast<uint32_t>(RC[r_idx]);
+}
+
+// GIFT-128 key state updation function, as defined in top of page 7 of
+// GIFT-COFB specification
+// https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+inline static void
+update_key_state(state_t* const st)
+{
+  const uint16_t t0 = std::rotr(st->key[6], 2);
+  const uint16_t t1 = std::rotr(st->key[7], 12);
+
+  uint16_t tmp[6];
+  std::memcpy(tmp, st->key, sizeof(tmp));
+  std::memcpy(st->key + 2, tmp, sizeof(tmp));
+
+  st->key[0] = t0;
+  st->key[1] = t1;
 }
 
 }
