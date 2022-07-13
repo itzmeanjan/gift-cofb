@@ -119,7 +119,7 @@ perm_word(const uint32_t w, const uint32_t* const bit_perm)
   uint32_t tmp = 0u;
 
   for (size_t i = 0; i < 32; i++) {
-    tmp |= ((w >> i) & 0b1u) << bit_perm[i];
+    tmp |= ((w >> bit_perm[i]) & 0b1u) << i;
   }
 
   return tmp;
