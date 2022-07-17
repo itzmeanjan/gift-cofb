@@ -412,10 +412,10 @@ decrypt(const uint8_t* const __restrict key,   // 128 -bit key
 
         dblk[j] = eblk[j] ^ y[j];
 
-        txt[off + (boff ^ 0)] = static_cast<uint8_t>(dblk[i] >> 24);
-        txt[off + (boff ^ 1)] = static_cast<uint8_t>(dblk[i] >> 16);
-        txt[off + (boff ^ 2)] = static_cast<uint8_t>(dblk[i] >> 8);
-        txt[off + (boff ^ 3)] = static_cast<uint8_t>(dblk[i] >> 0);
+        txt[off + (boff ^ 0)] = static_cast<uint8_t>(dblk[j] >> 24);
+        txt[off + (boff ^ 1)] = static_cast<uint8_t>(dblk[j] >> 16);
+        txt[off + (boff ^ 2)] = static_cast<uint8_t>(dblk[j] >> 8);
+        txt[off + (boff ^ 3)] = static_cast<uint8_t>(dblk[j] >> 0);
       }
 
       off += 16;
