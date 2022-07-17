@@ -27,9 +27,7 @@ uint8_tp = np.ctypeslib.ndpointer(dtype=u8, ndim=1, flags="CONTIGUOUS")
 bool_t = c_bool
 
 
-def gift_cofb_encrypt(
-    key: bytes, nonce: bytes, data: bytes, text: bytes
-) -> Tuple[bytes, bytes]:
+def encrypt(key: bytes, nonce: bytes, data: bytes, text: bytes) -> Tuple[bytes, bytes]:
     """
     Encrypts M ( >=0 ) -bytes plain text, with GIFT-COFB AEAD,
     while using 16 -bytes secret key, 16 -bytes public message nonce &
@@ -60,7 +58,7 @@ def gift_cofb_encrypt(
     return enc_, tag_
 
 
-def gift_cofb_decrypt(
+def decrypt(
     key: bytes, nonce: bytes, tag: bytes, data: bytes, enc: bytes
 ) -> Tuple[bool, bytes]:
     """
