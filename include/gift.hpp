@@ -82,6 +82,25 @@ initialize(state_t* const __restrict st,        // GIFT-128 block cipher state
   }
 }
 
+// Initializing GIFT-128 block cipher state with plain text block and secret
+// key, as defined in section 2.4.2 of GIFT-COFB specification
+// https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+inline static void
+initialize(state_t* const __restrict st,         // GIFT-128 block cipher state
+           const uint32_t* const __restrict txt, // 128 -bit plain text block
+           const uint8_t* const __restrict key   // 128 -bit secret key
+)
+{
+  std::memcpy(st->cipher, txt, 16);
+
+  for (size_t i = 0; i < 8; i++) {
+    const size_t boff = i << 1;
+
+    st->key[i] = (static_cast<uint16_t>(key[boff ^ 0]) << 8) |
+                 (static_cast<uint16_t>(key[boff ^ 1]) << 0);
+  }
+}
+
 // Substitutes cells of cipher state with following instructions, as defined in
 // page 5 of GIFT-COFB specification
 // https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
@@ -274,14 +293,15 @@ round(state_t* const st, const size_t r_idx)
 }
 
 // GIFT-128 substitution permutation network ( SPN ) block cipher, operating on
-// initialized cipher/ key state, by applying 40 iterative rounds of GIFT-128
+// initialized cipher/ key state, by applying R iterative rounds of GIFT-128
 //
 // See section 2.4.1 of GIFT-COFB specification
 // https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+template<const size_t R>
 inline static void
 permute(state_t* const st)
 {
-  for (size_t i = 0; i < ROUNDS; i++) {
+  for (size_t i = 0; i < R; i++) {
     round(st, i);
   }
 }
