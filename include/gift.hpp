@@ -293,14 +293,15 @@ round(state_t* const st, const size_t r_idx)
 }
 
 // GIFT-128 substitution permutation network ( SPN ) block cipher, operating on
-// initialized cipher/ key state, by applying 40 iterative rounds of GIFT-128
+// initialized cipher/ key state, by applying R iterative rounds of GIFT-128
 //
 // See section 2.4.1 of GIFT-COFB specification
 // https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf
+template<const size_t R>
 inline static void
 permute(state_t* const st)
 {
-  for (size_t i = 0; i < ROUNDS; i++) {
+  for (size_t i = 0; i < R; i++) {
     round(st, i);
   }
 }

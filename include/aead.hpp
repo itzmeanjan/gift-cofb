@@ -25,7 +25,7 @@ encrypt(const uint8_t* const __restrict key,   // 128 -bit key
 {
   gift::state_t st;
   gift::initialize(&st, nonce, key);
-  gift::permute(&st);
+  gift::permute<gift::ROUNDS>(&st);
 
   uint32_t tmp[4];
 
@@ -69,7 +69,7 @@ encrypt(const uint8_t* const __restrict key,   // 128 -bit key
       blk[3] ^= tmp[3];
 
       gift::initialize(&st, blk, key);
-      gift::permute(&st);
+      gift::permute<gift::ROUNDS>(&st);
 
       std::memcpy(y, st.cipher, sizeof(y));
     }
@@ -127,7 +127,7 @@ encrypt(const uint8_t* const __restrict key,   // 128 -bit key
     padded_blk[3] ^= tmp[3];
 
     gift::initialize(&st, padded_blk, key);
-    gift::permute(&st);
+    gift::permute<gift::ROUNDS>(&st);
 
     std::memcpy(y, st.cipher, sizeof(y));
   }
@@ -174,7 +174,7 @@ encrypt(const uint8_t* const __restrict key,   // 128 -bit key
       blk[3] ^= tmp[3];
 
       gift::initialize(&st, blk, key);
-      gift::permute(&st);
+      gift::permute<gift::ROUNDS>(&st);
 
       std::memcpy(y, st.cipher, sizeof(y));
     }
@@ -241,7 +241,7 @@ encrypt(const uint8_t* const __restrict key,   // 128 -bit key
     padded_blk[3] ^= tmp[3];
 
     gift::initialize(&st, padded_blk, key);
-    gift::permute(&st);
+    gift::permute<gift::ROUNDS>(&st);
 
     std::memcpy(y, st.cipher, sizeof(y));
   }
@@ -279,7 +279,7 @@ decrypt(const uint8_t* const __restrict key,   // 128 -bit key
 {
   gift::state_t st;
   gift::initialize(&st, nonce, key);
-  gift::permute(&st);
+  gift::permute<gift::ROUNDS>(&st);
 
   uint32_t tmp[4];
 
@@ -323,7 +323,7 @@ decrypt(const uint8_t* const __restrict key,   // 128 -bit key
       blk[3] ^= tmp[3];
 
       gift::initialize(&st, blk, key);
-      gift::permute(&st);
+      gift::permute<gift::ROUNDS>(&st);
 
       std::memcpy(y, st.cipher, sizeof(y));
     }
@@ -381,7 +381,7 @@ decrypt(const uint8_t* const __restrict key,   // 128 -bit key
     padded_blk[3] ^= tmp[3];
 
     gift::initialize(&st, padded_blk, key);
-    gift::permute(&st);
+    gift::permute<gift::ROUNDS>(&st);
 
     std::memcpy(y, st.cipher, sizeof(y));
   }
@@ -429,7 +429,7 @@ decrypt(const uint8_t* const __restrict key,   // 128 -bit key
       dblk[3] ^= tmp[3];
 
       gift::initialize(&st, dblk, key);
-      gift::permute(&st);
+      gift::permute<gift::ROUNDS>(&st);
 
       std::memcpy(y, st.cipher, sizeof(y));
     }
@@ -519,7 +519,7 @@ decrypt(const uint8_t* const __restrict key,   // 128 -bit key
     dpadded_blk[3] ^= tmp[3];
 
     gift::initialize(&st, dpadded_blk, key);
-    gift::permute(&st);
+    gift::permute<gift::ROUNDS>(&st);
 
     std::memcpy(y, st.cipher, sizeof(y));
   }
