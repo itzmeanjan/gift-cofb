@@ -246,7 +246,7 @@ GIFT-COFB is written as zero-dependency, header-only C++ library, which makes it
 
 I'm keeping an example [here](./example/gift_cofb.cpp), I suggest you go through that to understand usage of GIFT-COFB AEAD interface.
 
-When compiled, following instruction provided in aforelinked example file, you may see something like following in your console.
+When compiled & executed, following instruction provided in aforelinked example file, you may see something like following in your console.
 
 ```bash
 GIFT-COFB AEAD
