@@ -239,3 +239,22 @@ bench_gift_cofb::decrypt/32/2048      328588 ns       328585 ns         2130 byt
 bench_gift_cofb::encrypt/32/4096      652360 ns       652339 ns         1074 bytes_per_second=6.03485M/s
 bench_gift_cofb::decrypt/32/4096      649506 ns       649485 ns         1078 bytes_per_second=6.06137M/s
 ```
+
+## Example
+
+GIFT-COFB is written as zero-dependency, header-only C++ library, which makes it easy to use --- just include header file `aead.hpp` and start using encrypt/ decrypt functions, placed inside `gift_cofb` namespace. Finally during compilation, let your compiler know where it can find GIFT-COFB header files.
+
+I'm keeping an example [here](./example/gift_cofb.cpp), I suggest you go through that to understand usage of GIFT-COFB AEAD interface.
+
+When compiled, following instruction provided in aforelinked example file, you may see something like following in your console.
+
+```bash
+GIFT-COFB AEAD
+
+Key       : 899ce2b50912e0c12ac5d8de52e28b58
+Nonce     : 1372af739aa2767b75fee2d1ad7af248
+Text      : dc2f1091be5def568ce3454c6acec6a18471bbb922f33e891f0a10165dd22e4c
+Encrypted : fc1d7844f75de1f4d9f289b487cd389b43bfd8fb43ec2f105e335d56c8c62286
+Tag       : b848923b790cdb43fffcb4de51c4ffe0
+Decrypted : dc2f1091be5def568ce3454c6acec6a18471bbb922f33e891f0a10165dd22e4c
+```
