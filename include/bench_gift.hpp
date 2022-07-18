@@ -6,8 +6,9 @@
 // Benchmark GIFT-COFB Authenticated Encryption on CPU
 namespace bench_gift_cofb {
 
-// Benchmark GIFT-128 permutation ( 40 -rounds ) on CPU, by generating 128 -bit
-// random plain text and secret key
+// Benchmark GIFT-128 permutation ( R -rounds ) on CPU, by generating 128 -bit
+// random plain text and secret key | R <= 40
+template<const size_t R>
 static void
 gift_permute(benchmark::State& state)
 {
@@ -23,7 +24,7 @@ gift_permute(benchmark::State& state)
   gift::initialize(&st, txt, key);
 
   for (auto _ : state) {
-    gift::permute(&st);
+    gift::permute<R>(&st);
 
     benchmark::DoNotOptimize(st);
     benchmark::ClobberMemory();
