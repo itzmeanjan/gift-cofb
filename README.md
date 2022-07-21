@@ -100,7 +100,7 @@ make benchmark
 ### On AWS Graviton3
 
 ```bash
-2022-07-18T08:53:46+00:00
+2022-07-21T10:49:17+00:00
 Running ./bench/a.out
 Run on (64 X 2100 MHz CPU s)
 CPU Caches:
@@ -108,29 +108,29 @@ CPU Caches:
   L1 Instruction 64 KiB (x64)
   L2 Unified 1024 KiB (x64)
   L3 Unified 32768 KiB (x1)
-Load Average: 0.00, 0.00, 0.00
+Load Average: 0.07, 0.02, 0.00
 --------------------------------------------------------------------------------------------
 Benchmark                                  Time             CPU   Iterations UserCounters...
 --------------------------------------------------------------------------------------------
-bench_gift_cofb::gift_permute<1>        38.7 ns         38.7 ns     18096719 bytes_per_second=394.154M/s
-bench_gift_cofb::gift_permute<2>        77.0 ns         77.0 ns      9097376 bytes_per_second=198.279M/s
-bench_gift_cofb::gift_permute<3>         115 ns          115 ns      6067760 bytes_per_second=132.277M/s
-bench_gift_cofb::gift_permute<4>         153 ns          153 ns      4571276 bytes_per_second=99.6389M/s
-bench_gift_cofb::gift_permute<40>       1533 ns         1533 ns       457166 bytes_per_second=9.95102M/s
-bench_gift_cofb::encrypt/32/64         10923 ns        10923 ns        64074 bytes_per_second=8.38165M/s
-bench_gift_cofb::decrypt/32/64         10896 ns        10896 ns        64259 bytes_per_second=8.40228M/s
-bench_gift_cofb::encrypt/32/128        17145 ns        17145 ns        40833 bytes_per_second=8.89981M/s
-bench_gift_cofb::decrypt/32/128        17092 ns        17092 ns        41004 bytes_per_second=8.92751M/s
-bench_gift_cofb::encrypt/32/256        29581 ns        29581 ns        23663 bytes_per_second=9.28507M/s
-bench_gift_cofb::decrypt/32/256        29478 ns        29476 ns        23757 bytes_per_second=9.31789M/s
-bench_gift_cofb::encrypt/32/512        54462 ns        54461 ns        12854 bytes_per_second=9.52615M/s
-bench_gift_cofb::decrypt/32/512        54235 ns        54234 ns        12923 bytes_per_second=9.5659M/s
-bench_gift_cofb::encrypt/32/1024      104215 ns       104212 ns         6717 bytes_per_second=9.66376M/s
-bench_gift_cofb::decrypt/32/1024      103752 ns       103750 ns         6756 bytes_per_second=9.70679M/s
-bench_gift_cofb::encrypt/32/2048      203723 ns       203719 ns         3436 bytes_per_second=9.73715M/s
-bench_gift_cofb::decrypt/32/2048      202750 ns       202746 ns         3453 bytes_per_second=9.78389M/s
-bench_gift_cofb::encrypt/32/4096      402739 ns       402731 ns         1738 bytes_per_second=9.77517M/s
-bench_gift_cofb::decrypt/32/4096      399705 ns       399695 ns         1751 bytes_per_second=9.84942M/s
+bench_gift_cofb::gift_permute<1>        29.8 ns         29.8 ns     23530891 bytes_per_second=512.345M/s
+bench_gift_cofb::gift_permute<2>        63.5 ns         63.5 ns     11029182 bytes_per_second=240.313M/s
+bench_gift_cofb::gift_permute<3>        92.6 ns         92.6 ns      7566764 bytes_per_second=164.87M/s
+bench_gift_cofb::gift_permute<4>         121 ns          121 ns      5790216 bytes_per_second=126.211M/s
+bench_gift_cofb::gift_permute<40>       1168 ns         1168 ns       599762 bytes_per_second=13.0662M/s
+bench_gift_cofb::encrypt/32/64          8163 ns         8162 ns        85775 bytes_per_second=11.2164M/s
+bench_gift_cofb::decrypt/32/64          8147 ns         8147 ns        85948 bytes_per_second=11.2381M/s
+bench_gift_cofb::encrypt/32/128        12841 ns        12841 ns        54514 bytes_per_second=11.8827M/s
+bench_gift_cofb::decrypt/32/128        12801 ns        12800 ns        54707 bytes_per_second=11.9205M/s
+bench_gift_cofb::encrypt/32/256        22180 ns        22179 ns        31561 bytes_per_second=12.3838M/s
+bench_gift_cofb::decrypt/32/256        22113 ns        22113 ns        31653 bytes_per_second=12.4209M/s
+bench_gift_cofb::encrypt/32/512        40857 ns        40856 ns        17127 bytes_per_second=12.6983M/s
+bench_gift_cofb::decrypt/32/512        40756 ns        40755 ns        17176 bytes_per_second=12.7297M/s
+bench_gift_cofb::encrypt/32/1024       78241 ns        78239 ns         8944 bytes_per_second=12.8718M/s
+bench_gift_cofb::decrypt/32/1024       77996 ns        77994 ns         8974 bytes_per_second=12.9123M/s
+bench_gift_cofb::encrypt/32/2048      152951 ns       152947 ns         4576 bytes_per_second=12.9695M/s
+bench_gift_cofb::decrypt/32/2048      152426 ns       152422 ns         4592 bytes_per_second=13.0141M/s
+bench_gift_cofb::encrypt/32/4096      302457 ns       302451 ns         2315 bytes_per_second=13.0162M/s
+bench_gift_cofb::decrypt/32/4096      301401 ns       301395 ns         2322 bytes_per_second=13.0618M/s
 ```
 
 ### On Intel(R) Core(TM) i5-8279U CPU @ 2.40GHz
@@ -172,36 +172,36 @@ bench_gift_cofb::decrypt/32/4096      372943 ns       372359 ns         1817 byt
 ### On AWS Graviton2
 
 ```bash
-2022-07-18T08:52:45+00:00
+2022-07-21T10:46:10+00:00
 Running ./bench/a.out
 Run on (16 X 166.66 MHz CPU s)
 CPU Caches:
   L1 Data 32 KiB (x16)
   L1 Instruction 48 KiB (x16)
   L2 Unified 2048 KiB (x4)
-Load Average: 0.11, 0.03, 0.01
+Load Average: 0.18, 0.05, 0.01
 --------------------------------------------------------------------------------------------
 Benchmark                                  Time             CPU   Iterations UserCounters...
 --------------------------------------------------------------------------------------------
-bench_gift_cofb::gift_permute<1>        89.2 ns         89.2 ns      7842990 bytes_per_second=171.08M/s
-bench_gift_cofb::gift_permute<2>         175 ns          175 ns      4002040 bytes_per_second=87.2417M/s
-bench_gift_cofb::gift_permute<3>         260 ns          260 ns      2690410 bytes_per_second=58.6453M/s
-bench_gift_cofb::gift_permute<4>         346 ns          346 ns      2021209 bytes_per_second=44.0592M/s
-bench_gift_cofb::gift_permute<40>       3440 ns         3440 ns       203497 bytes_per_second=4.43588M/s
-bench_gift_cofb::encrypt/32/64         24686 ns        24685 ns        28355 bytes_per_second=3.70879M/s
-bench_gift_cofb::decrypt/32/64         24286 ns        24285 ns        28824 bytes_per_second=3.76988M/s
-bench_gift_cofb::encrypt/32/128        38785 ns        38784 ns        18048 bytes_per_second=3.93426M/s
-bench_gift_cofb::decrypt/32/128        38118 ns        38117 ns        18364 bytes_per_second=4.00312M/s
-bench_gift_cofb::encrypt/32/256        66983 ns        66982 ns        10450 bytes_per_second=4.10046M/s
-bench_gift_cofb::decrypt/32/256        65786 ns        65785 ns        10640 bytes_per_second=4.1751M/s
-bench_gift_cofb::encrypt/32/512       123377 ns       123377 ns         5672 bytes_per_second=4.205M/s
-bench_gift_cofb::decrypt/32/512       121119 ns       121117 ns         5779 bytes_per_second=4.28345M/s
-bench_gift_cofb::encrypt/32/1024      236173 ns       236172 ns         2964 bytes_per_second=4.26418M/s
-bench_gift_cofb::decrypt/32/1024      231794 ns       231790 ns         3020 bytes_per_second=4.34479M/s
-bench_gift_cofb::encrypt/32/2048      461756 ns       461753 ns         1516 bytes_per_second=4.2959M/s
-bench_gift_cofb::decrypt/32/2048      453119 ns       453111 ns         1545 bytes_per_second=4.37782M/s
-bench_gift_cofb::encrypt/32/4096      912965 ns       912950 ns          767 bytes_per_second=4.31214M/s
-bench_gift_cofb::decrypt/32/4096      895944 ns       895916 ns          781 bytes_per_second=4.39412M/s
+bench_gift_cofb::gift_permute<1>        85.0 ns         84.9 ns      8236545 bytes_per_second=179.622M/s
+bench_gift_cofb::gift_permute<2>         177 ns          177 ns      3962790 bytes_per_second=86.3807M/s
+bench_gift_cofb::gift_permute<3>         261 ns          261 ns      2684927 bytes_per_second=58.4958M/s
+bench_gift_cofb::gift_permute<4>         346 ns          346 ns      2024627 bytes_per_second=44.1328M/s
+bench_gift_cofb::gift_permute<40>       3410 ns         3410 ns       205259 bytes_per_second=4.47441M/s
+bench_gift_cofb::encrypt/32/64         24197 ns        24196 ns        28929 bytes_per_second=3.78372M/s
+bench_gift_cofb::decrypt/32/64         24067 ns        24067 ns        29085 bytes_per_second=3.80406M/s
+bench_gift_cofb::encrypt/32/128        37956 ns        37955 ns        18443 bytes_per_second=4.02019M/s
+bench_gift_cofb::decrypt/32/128        37640 ns        37640 ns        18597 bytes_per_second=4.05389M/s
+bench_gift_cofb::encrypt/32/256        65473 ns        65472 ns        10691 bytes_per_second=4.19502M/s
+bench_gift_cofb::decrypt/32/256        64786 ns        64785 ns        10804 bytes_per_second=4.23953M/s
+bench_gift_cofb::encrypt/32/512       120510 ns       120509 ns         5809 bytes_per_second=4.30506M/s
+bench_gift_cofb::decrypt/32/512       119079 ns       119077 ns         5879 bytes_per_second=4.35685M/s
+bench_gift_cofb::encrypt/32/1024      230584 ns       230583 ns         3036 bytes_per_second=4.36754M/s
+bench_gift_cofb::decrypt/32/1024      227656 ns       227654 ns         3075 bytes_per_second=4.42373M/s
+bench_gift_cofb::encrypt/32/2048      450730 ns       450720 ns         1553 bytes_per_second=4.40105M/s
+bench_gift_cofb::decrypt/32/2048      444825 ns       444822 ns         1574 bytes_per_second=4.45941M/s
+bench_gift_cofb::encrypt/32/4096      891281 ns       891275 ns          785 bytes_per_second=4.417M/s
+bench_gift_cofb::decrypt/32/4096      879147 ns       879141 ns          796 bytes_per_second=4.47797M/s
 ```
 
 ### On Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz
