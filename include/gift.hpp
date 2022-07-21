@@ -126,102 +126,6 @@ sub_cells(state_t* const st)
   std::swap(st->cipher[0], st->cipher[3]);
 }
 
-// 32 -bit bit permutation, applied to S0 word of GIFT-128 cipher state, as
-// listed in table 2.2 of GIFT-COFB specification
-inline static uint32_t
-perm_word0(const uint32_t w)
-{
-  const uint32_t t0 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
-                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
-                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
-
-  const uint32_t t1 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
-                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
-                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
-
-  const uint32_t t2 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
-                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
-                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
-
-  const uint32_t t3 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
-                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
-                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
-
-  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
-}
-
-// 32 -bit bit permutation, applied to S1 word of GIFT-128 cipher state, as
-// listed in table 2.2 of GIFT-COFB specification
-inline static uint32_t
-perm_word1(const uint32_t w)
-{
-  const uint32_t t0 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
-                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
-                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
-
-  const uint32_t t1 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
-                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
-                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
-
-  const uint32_t t2 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
-                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
-                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
-
-  const uint32_t t3 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
-                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
-                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
-
-  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
-}
-
-// 32 -bit bit permutation, applied to S2 word of GIFT-128 cipher state, as
-// listed in table 2.2 of GIFT-COFB specification
-inline static uint32_t
-perm_word2(const uint32_t w)
-{
-  const uint32_t t0 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
-                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
-                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
-
-  const uint32_t t1 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
-                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
-                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
-
-  const uint32_t t2 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
-                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
-                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
-
-  const uint32_t t3 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
-                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
-                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
-
-  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
-}
-
-// 32 -bit bit permutation, applied to S3 word of GIFT-128 cipher state, as
-// listed in table 2.2 of GIFT-COFB specification
-inline static uint32_t
-perm_word3(const uint32_t w)
-{
-  const uint32_t t0 = ((w >> 24) & B7) ^ ((w >> 21) & B6) ^ ((w >> 18) & B5) ^
-                      ((w >> 15) & B4) ^ ((w >> 12) & B3) ^ ((w >> 9) & B2) ^
-                      ((w >> 6) & B1) ^ ((w >> 3) & B0);
-
-  const uint32_t t1 = ((w >> 23) & B7) ^ ((w >> 20) & B6) ^ ((w >> 17) & B5) ^
-                      ((w >> 14) & B4) ^ ((w >> 11) & B3) ^ ((w >> 8) & B2) ^
-                      ((w >> 5) & B1) ^ ((w >> 2) & B0);
-
-  const uint32_t t2 = ((w >> 22) & B7) ^ ((w >> 19) & B6) ^ ((w >> 16) & B5) ^
-                      ((w >> 13) & B4) ^ ((w >> 10) & B3) ^ ((w >> 7) & B2) ^
-                      ((w >> 4) & B1) ^ ((w >> 1) & B0);
-
-  const uint32_t t3 = ((w >> 21) & B7) ^ ((w >> 18) & B6) ^ ((w >> 15) & B5) ^
-                      ((w >> 12) & B4) ^ ((w >> 9) & B3) ^ ((w >> 6) & B2) ^
-                      ((w >> 3) & B1) ^ ((w >> 0) & B0);
-
-  return (t3 << 24) ^ (t2 << 16) ^ (t1 << 8) ^ (t0 << 0);
-}
-
 // Four different 32 -bit bit permutations are independently applied on each
 // word of cipher state of GIFT-128 block cipher
 //
@@ -230,10 +134,95 @@ perm_word3(const uint32_t w)
 inline static void
 perm_bits(state_t* const st)
 {
-  st->cipher[0] = perm_word0(st->cipher[0]);
-  st->cipher[1] = perm_word1(st->cipher[1]);
-  st->cipher[2] = perm_word2(st->cipher[2]);
-  st->cipher[3] = perm_word3(st->cipher[3]);
+  const uint32_t s0 = st->cipher[0];
+  const uint32_t s1 = st->cipher[1];
+  const uint32_t s2 = st->cipher[2];
+  const uint32_t s3 = st->cipher[3];
+
+  const uint32_t s0b0 = ((s0 >> 21) & B7) ^ ((s0 >> 18) & B6) ^
+                        ((s0 >> 15) & B5) ^ ((s0 >> 12) & B4) ^
+                        ((s0 >> 9) & B3) ^ ((s0 >> 6) & B2) ^ ((s0 >> 3) & B1) ^
+                        ((s0 >> 0) & B0);
+
+  const uint32_t s1b1 = ((s1 >> 21) & B7) ^ ((s1 >> 18) & B6) ^
+                        ((s1 >> 15) & B5) ^ ((s1 >> 12) & B4) ^
+                        ((s1 >> 9) & B3) ^ ((s1 >> 6) & B2) ^ ((s1 >> 3) & B1) ^
+                        ((s1 >> 0) & B0);
+
+  const uint32_t s1b0 = ((s1 >> 22) & B7) ^ ((s1 >> 19) & B6) ^
+                        ((s1 >> 16) & B5) ^ ((s1 >> 13) & B4) ^
+                        ((s1 >> 10) & B3) ^ ((s1 >> 7) & B2) ^
+                        ((s1 >> 4) & B1) ^ ((s1 >> 1) & B0);
+
+  const uint32_t s2b1 = ((s2 >> 22) & B7) ^ ((s2 >> 19) & B6) ^
+                        ((s2 >> 16) & B5) ^ ((s2 >> 13) & B4) ^
+                        ((s2 >> 10) & B3) ^ ((s2 >> 7) & B2) ^
+                        ((s2 >> 4) & B1) ^ ((s2 >> 1) & B0);
+
+  const uint32_t s2b0 = ((s2 >> 23) & B7) ^ ((s2 >> 20) & B6) ^
+                        ((s2 >> 17) & B5) ^ ((s2 >> 14) & B4) ^
+                        ((s2 >> 11) & B3) ^ ((s2 >> 8) & B2) ^
+                        ((s2 >> 5) & B1) ^ ((s2 >> 2) & B0);
+
+  const uint32_t s3b1 = ((s3 >> 23) & B7) ^ ((s3 >> 20) & B6) ^
+                        ((s3 >> 17) & B5) ^ ((s3 >> 14) & B4) ^
+                        ((s3 >> 11) & B3) ^ ((s3 >> 8) & B2) ^
+                        ((s3 >> 5) & B1) ^ ((s3 >> 2) & B0);
+
+  const uint32_t s3b0 = ((s3 >> 24) & B7) ^ ((s3 >> 21) & B6) ^
+                        ((s3 >> 18) & B5) ^ ((s3 >> 15) & B4) ^
+                        ((s3 >> 12) & B3) ^ ((s3 >> 9) & B2) ^
+                        ((s3 >> 6) & B1) ^ ((s3 >> 3) & B0);
+
+  const uint32_t s0b1 = ((s0 >> 24) & B7) ^ ((s0 >> 21) & B6) ^
+                        ((s0 >> 18) & B5) ^ ((s0 >> 15) & B4) ^
+                        ((s0 >> 12) & B3) ^ ((s0 >> 9) & B2) ^
+                        ((s0 >> 6) & B1) ^ ((s0 >> 3) & B0);
+
+  const uint32_t s0b2 = ((s0 >> 23) & B7) ^ ((s0 >> 20) & B6) ^
+                        ((s0 >> 17) & B5) ^ ((s0 >> 14) & B4) ^
+                        ((s0 >> 11) & B3) ^ ((s0 >> 8) & B2) ^
+                        ((s0 >> 5) & B1) ^ ((s0 >> 2) & B0);
+
+  const uint32_t s1b3 = ((s1 >> 23) & B7) ^ ((s1 >> 20) & B6) ^
+                        ((s1 >> 17) & B5) ^ ((s1 >> 14) & B4) ^
+                        ((s1 >> 11) & B3) ^ ((s1 >> 8) & B2) ^
+                        ((s1 >> 5) & B1) ^ ((s1 >> 2) & B0);
+
+  const uint32_t s1b2 = ((s1 >> 24) & B7) ^ ((s1 >> 21) & B6) ^
+                        ((s1 >> 18) & B5) ^ ((s1 >> 15) & B4) ^
+                        ((s1 >> 12) & B3) ^ ((s1 >> 9) & B2) ^
+                        ((s1 >> 6) & B1) ^ ((s1 >> 3) & B0);
+
+  const uint32_t s2b3 = ((s2 >> 24) & B7) ^ ((s2 >> 21) & B6) ^
+                        ((s2 >> 18) & B5) ^ ((s2 >> 15) & B4) ^
+                        ((s2 >> 12) & B3) ^ ((s2 >> 9) & B2) ^
+                        ((s2 >> 6) & B1) ^ ((s2 >> 3) & B0);
+
+  const uint32_t s2b2 = ((s2 >> 21) & B7) ^ ((s2 >> 18) & B6) ^
+                        ((s2 >> 15) & B5) ^ ((s2 >> 12) & B4) ^
+                        ((s2 >> 9) & B3) ^ ((s2 >> 6) & B2) ^ ((s2 >> 3) & B1) ^
+                        ((s2 >> 0) & B0);
+
+  const uint32_t s3b3 = ((s3 >> 21) & B7) ^ ((s3 >> 18) & B6) ^
+                        ((s3 >> 15) & B5) ^ ((s3 >> 12) & B4) ^
+                        ((s3 >> 9) & B3) ^ ((s3 >> 6) & B2) ^ ((s3 >> 3) & B1) ^
+                        ((s3 >> 0) & B0);
+
+  const uint32_t s3b2 = ((s3 >> 22) & B7) ^ ((s3 >> 19) & B6) ^
+                        ((s3 >> 16) & B5) ^ ((s3 >> 13) & B4) ^
+                        ((s3 >> 10) & B3) ^ ((s3 >> 7) & B2) ^
+                        ((s3 >> 4) & B1) ^ ((s3 >> 1) & B0);
+
+  const uint32_t s0b3 = ((s0 >> 22) & B7) ^ ((s0 >> 19) & B6) ^
+                        ((s0 >> 16) & B5) ^ ((s0 >> 13) & B4) ^
+                        ((s0 >> 10) & B3) ^ ((s0 >> 7) & B2) ^
+                        ((s0 >> 4) & B1) ^ ((s0 >> 1) & B0);
+
+  st->cipher[0] = (s0b3 << 24) ^ (s0b2 << 16) ^ (s0b1 << 8) ^ s0b0;
+  st->cipher[1] = (s1b3 << 24) ^ (s1b2 << 16) ^ (s1b1 << 8) ^ s1b0;
+  st->cipher[2] = (s2b3 << 24) ^ (s2b2 << 16) ^ (s2b1 << 8) ^ s2b0;
+  st->cipher[3] = (s3b3 << 24) ^ (s3b2 << 16) ^ (s3b1 << 8) ^ s3b0;
 }
 
 // Adds round keys and round constants to cipher state of GIFT-128 block cipher
