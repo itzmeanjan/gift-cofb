@@ -5,6 +5,10 @@
 #include <cstdint>
 #include <cstring>
 
+#if defined __ARM_NEON
+#include <arm_neon.h>
+#endif
+
 // GIFT-128 Block Cipher
 namespace gift {
 
@@ -258,6 +262,99 @@ perm_bits(state_t* const st)
 #else
 #pragma message("Compiling for non-x86_64")
 
+#if defined __ARM_NEON
+#pragma message("ARM NEON is available")
+
+  constexpr uint32_t b7arr[]{ B7, B7, B7, B7 };
+  constexpr uint32_t b6arr[]{ B6, B6, B6, B6 };
+  constexpr uint32_t b5arr[]{ B5, B5, B5, B5 };
+  constexpr uint32_t b4arr[]{ B4, B4, B4, B4 };
+  constexpr uint32_t b3arr[]{ B3, B3, B3, B3 };
+  constexpr uint32_t b2arr[]{ B2, B2, B2, B2 };
+  constexpr uint32_t b1arr[]{ B1, B1, B1, B1 };
+  constexpr uint32_t b0arr[]{ B0, B0, B0, B0 };
+
+  const uint32x4_t b7vec = vld1q_u32(b7arr);
+  const uint32x4_t b6vec = vld1q_u32(b6arr);
+  const uint32x4_t b5vec = vld1q_u32(b5arr);
+  const uint32x4_t b4vec = vld1q_u32(b4arr);
+  const uint32x4_t b3vec = vld1q_u32(b3arr);
+  const uint32x4_t b2vec = vld1q_u32(b2arr);
+  const uint32x4_t b1vec = vld1q_u32(b1arr);
+  const uint32x4_t b0vec = vld1q_u32(b0arr);
+
+  const uint32x4_t s = vld1q_u32(st->cipher);
+
+  const uint32x4_t sa = veorq_u32(
+    veorq_u32(
+      veorq_u32(
+        veorq_u32(
+          veorq_u32(veorq_u32(veorq_u32(vandq_u32(vshrq_n_u32(s, 21), b7vec),
+                                        vandq_u32(vshrq_n_u32(s, 18), b6vec)),
+                              vandq_u32(vshrq_n_u32(s, 15), b5vec)),
+                    vandq_u32(vshrq_n_u32(s, 12), b4vec)),
+          vandq_u32(vshrq_n_u32(s, 9), b3vec)),
+        vandq_u32(vshrq_n_u32(s, 6), b2vec)),
+      vandq_u32(vshrq_n_u32(s, 3), b1vec)),
+    vandq_u32(vshrq_n_u32(s, 0), b0vec));
+
+  const uint32x4_t sb = veorq_u32(
+    veorq_u32(
+      veorq_u32(
+        veorq_u32(
+          veorq_u32(veorq_u32(veorq_u32(vandq_u32(vshrq_n_u32(s, 22), b7vec),
+                                        vandq_u32(vshrq_n_u32(s, 19), b6vec)),
+                              vandq_u32(vshrq_n_u32(s, 16), b5vec)),
+                    vandq_u32(vshrq_n_u32(s, 13), b4vec)),
+          vandq_u32(vshrq_n_u32(s, 10), b3vec)),
+        vandq_u32(vshrq_n_u32(s, 7), b2vec)),
+      vandq_u32(vshrq_n_u32(s, 4), b1vec)),
+    vandq_u32(vshrq_n_u32(s, 1), b0vec));
+
+  const uint32x4_t sc = veorq_u32(
+    veorq_u32(
+      veorq_u32(
+        veorq_u32(
+          veorq_u32(veorq_u32(veorq_u32(vandq_u32(vshrq_n_u32(s, 23), b7vec),
+                                        vandq_u32(vshrq_n_u32(s, 20), b6vec)),
+                              vandq_u32(vshrq_n_u32(s, 17), b5vec)),
+                    vandq_u32(vshrq_n_u32(s, 14), b4vec)),
+          vandq_u32(vshrq_n_u32(s, 11), b3vec)),
+        vandq_u32(vshrq_n_u32(s, 8), b2vec)),
+      vandq_u32(vshrq_n_u32(s, 5), b1vec)),
+    vandq_u32(vshrq_n_u32(s, 2), b0vec));
+
+  const uint32x4_t sd = veorq_u32(
+    veorq_u32(
+      veorq_u32(
+        veorq_u32(
+          veorq_u32(veorq_u32(veorq_u32(vandq_u32(vshrq_n_u32(s, 24), b7vec),
+                                        vandq_u32(vshrq_n_u32(s, 21), b6vec)),
+                              vandq_u32(vshrq_n_u32(s, 18), b5vec)),
+                    vandq_u32(vshrq_n_u32(s, 15), b4vec)),
+          vandq_u32(vshrq_n_u32(s, 12), b3vec)),
+        vandq_u32(vshrq_n_u32(s, 9), b2vec)),
+      vandq_u32(vshrq_n_u32(s, 6), b1vec)),
+    vandq_u32(vshrq_n_u32(s, 3), b0vec));
+
+  st->cipher[0] = (vgetq_lane_u32(sb, 0) << 24) ^
+                  (vgetq_lane_u32(sc, 0) << 16) ^ (vgetq_lane_u32(sd, 0) << 8) ^
+                  vgetq_lane_u32(sa, 0);
+
+  st->cipher[1] = (vgetq_lane_u32(sc, 1) << 24) ^
+                  (vgetq_lane_u32(sd, 1) << 16) ^ (vgetq_lane_u32(sa, 1) << 8) ^
+                  vgetq_lane_u32(sb, 1);
+
+  st->cipher[2] = (vgetq_lane_u32(sd, 2) << 24) ^
+                  (vgetq_lane_u32(sa, 2) << 16) ^ (vgetq_lane_u32(sb, 2) << 8) ^
+                  vgetq_lane_u32(sc, 2);
+
+  st->cipher[3] = (vgetq_lane_u32(sa, 3) << 24) ^
+                  (vgetq_lane_u32(sb, 3) << 16) ^ (vgetq_lane_u32(sc, 3) << 8) ^
+                  vgetq_lane_u32(sd, 3);
+
+#else
+
   uint32_t t0 = 0u;
   uint32_t t1 = 0u;
   uint32_t t2 = 0u;
@@ -274,6 +371,8 @@ perm_bits(state_t* const st)
   st->cipher[1] = t1;
   st->cipher[2] = t2;
   st->cipher[3] = t3;
+
+#endif
 
 #endif
 }
