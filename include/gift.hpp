@@ -36,6 +36,34 @@ constexpr uint32_t B1 = 0b00000010u;
 // Only bit 0 of 32 -bit word set
 constexpr uint32_t B0 = 0b00000001u;
 
+// 32 -bit bit permutation, applied to S0 word of cipher state, as listed in
+// table 2.2 of GIFT-COFB specification
+constexpr uint32_t BIT_PERM_S0[32] = { 0, 4, 8,  12, 16, 20, 24, 28,
+                                       3, 7, 11, 15, 19, 23, 27, 31,
+                                       2, 6, 10, 14, 18, 22, 26, 30,
+                                       1, 5, 9,  13, 17, 21, 25, 29 };
+
+// 32 -bit bit permutation, applied to S1 word of cipher state, as listed in
+// table 2.2 of GIFT-COFB specification
+constexpr uint32_t BIT_PERM_S1[32] = { 1, 5, 9,  13, 17, 21, 25, 29,
+                                       0, 4, 8,  12, 16, 20, 24, 28,
+                                       3, 7, 11, 15, 19, 23, 27, 31,
+                                       2, 6, 10, 14, 18, 22, 26, 30 };
+
+// 32 -bit bit permutation, applied to S2 word of cipher state, as listed in
+// table 2.2 of GIFT-COFB specification
+constexpr uint32_t BIT_PERM_S2[32] = { 2, 6, 10, 14, 18, 22, 26, 30,
+                                       1, 5, 9,  13, 17, 21, 25, 29,
+                                       0, 4, 8,  12, 16, 20, 24, 28,
+                                       3, 7, 11, 15, 19, 23, 27, 31 };
+
+// 32 -bit bit permutation, applied to S3 word of cipher state, as listed in
+// table 2.2 of GIFT-COFB specification
+constexpr uint32_t BIT_PERM_S3[32] = { 3, 7, 11, 15, 19, 23, 27, 31,
+                                       2, 6, 10, 14, 18, 22, 26, 30,
+                                       1, 5, 9,  13, 17, 21, 25, 29,
+                                       0, 4, 8,  12, 16, 20, 24, 28 };
+
 // GIFT-128 round constants which are generated from 6 -bit affine linear
 // feedback shift register ( LFSR ), see table in page 7 of GIFT-COFB
 // specification
@@ -134,6 +162,9 @@ sub_cells(state_t* const st)
 inline static void
 perm_bits(state_t* const st)
 {
+#if defined __x86_64__
+#pragma message("Compiling for x86_64")
+
   const uint32_t s0 = st->cipher[0];
   const uint32_t s1 = st->cipher[1];
   const uint32_t s2 = st->cipher[2];
@@ -223,6 +254,28 @@ perm_bits(state_t* const st)
   st->cipher[1] = (s1b3 << 24) ^ (s1b2 << 16) ^ (s1b1 << 8) ^ s1b0;
   st->cipher[2] = (s2b3 << 24) ^ (s2b2 << 16) ^ (s2b1 << 8) ^ s2b0;
   st->cipher[3] = (s3b3 << 24) ^ (s3b2 << 16) ^ (s3b1 << 8) ^ s3b0;
+
+#else
+#pragma message("Compiling for non-x86_64")
+
+  uint32_t t0 = 0u;
+  uint32_t t1 = 0u;
+  uint32_t t2 = 0u;
+  uint32_t t3 = 0u;
+
+  for (size_t i = 0; i < 32; i++) {
+    t0 |= ((st->cipher[0] >> BIT_PERM_S0[i]) & 0b1u) << i;
+    t1 |= ((st->cipher[1] >> BIT_PERM_S1[i]) & 0b1u) << i;
+    t2 |= ((st->cipher[2] >> BIT_PERM_S2[i]) & 0b1u) << i;
+    t3 |= ((st->cipher[3] >> BIT_PERM_S3[i]) & 0b1u) << i;
+  }
+
+  st->cipher[0] = t0;
+  st->cipher[1] = t1;
+  st->cipher[2] = t2;
+  st->cipher[3] = t3;
+
+#endif
 }
 
 // Adds round keys and round constants to cipher state of GIFT-128 block cipher
