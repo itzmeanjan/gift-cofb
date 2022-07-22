@@ -5,6 +5,10 @@
 #include <cstdint>
 #include <cstring>
 
+#if defined __SSE2__
+#include <immintrin.h>
+#endif
+
 #if defined __ARM_NEON
 #include <arm_neon.h>
 #endif
@@ -169,6 +173,129 @@ perm_bits(state_t* const st)
 #if defined __x86_64__
 #pragma message("Compiling for x86_64")
 
+#if defined __SSE2__
+#pragma message("SSE2 is available")
+
+  constexpr uint32_t b7arr[]{ B7, B7, B7, B7 };
+  constexpr uint32_t b6arr[]{ B6, B6, B6, B6 };
+  constexpr uint32_t b5arr[]{ B5, B5, B5, B5 };
+  constexpr uint32_t b4arr[]{ B4, B4, B4, B4 };
+  constexpr uint32_t b3arr[]{ B3, B3, B3, B3 };
+  constexpr uint32_t b2arr[]{ B2, B2, B2, B2 };
+  constexpr uint32_t b1arr[]{ B1, B1, B1, B1 };
+  constexpr uint32_t b0arr[]{ B0, B0, B0, B0 };
+
+  const __m128i b7vec = _mm_load_si128((__m128i*)b7arr);
+  const __m128i b6vec = _mm_load_si128((__m128i*)b6arr);
+  const __m128i b5vec = _mm_load_si128((__m128i*)b5arr);
+  const __m128i b4vec = _mm_load_si128((__m128i*)b4arr);
+  const __m128i b3vec = _mm_load_si128((__m128i*)b3arr);
+  const __m128i b2vec = _mm_load_si128((__m128i*)b2arr);
+  const __m128i b1vec = _mm_load_si128((__m128i*)b1arr);
+  const __m128i b0vec = _mm_load_si128((__m128i*)b0arr);
+
+  const __m128i s = _mm_load_si128((__m128i*)st->cipher);
+
+  const __m128i sa = _mm_xor_si128(
+    _mm_xor_si128(
+      _mm_xor_si128(
+        _mm_xor_si128(
+          _mm_xor_si128(
+            _mm_xor_si128(
+              _mm_xor_si128(_mm_and_si128(_mm_srli_epi32(s, 21), b7vec),
+                            _mm_and_si128(_mm_srli_epi32(s, 18), b6vec)),
+              _mm_and_si128(_mm_srli_epi32(s, 15), b5vec)),
+            _mm_and_si128(_mm_srli_epi32(s, 12), b4vec)),
+          _mm_and_si128(_mm_srli_epi32(s, 9), b3vec)),
+        _mm_and_si128(_mm_srli_epi32(s, 6), b2vec)),
+      _mm_and_si128(_mm_srli_epi32(s, 3), b1vec)),
+    _mm_and_si128(_mm_srli_epi32(s, 0), b0vec));
+
+  const __m128i sb = _mm_xor_si128(
+    _mm_xor_si128(
+      _mm_xor_si128(
+        _mm_xor_si128(
+          _mm_xor_si128(
+            _mm_xor_si128(
+              _mm_xor_si128(_mm_and_si128(_mm_srli_epi32(s, 22), b7vec),
+                            _mm_and_si128(_mm_srli_epi32(s, 19), b6vec)),
+              _mm_and_si128(_mm_srli_epi32(s, 16), b5vec)),
+            _mm_and_si128(_mm_srli_epi32(s, 13), b4vec)),
+          _mm_and_si128(_mm_srli_epi32(s, 10), b3vec)),
+        _mm_and_si128(_mm_srli_epi32(s, 7), b2vec)),
+      _mm_and_si128(_mm_srli_epi32(s, 4), b1vec)),
+    _mm_and_si128(_mm_srli_epi32(s, 1), b0vec));
+
+  const __m128i sc = _mm_xor_si128(
+    _mm_xor_si128(
+      _mm_xor_si128(
+        _mm_xor_si128(
+          _mm_xor_si128(
+            _mm_xor_si128(
+              _mm_xor_si128(_mm_and_si128(_mm_srli_epi32(s, 23), b7vec),
+                            _mm_and_si128(_mm_srli_epi32(s, 20), b6vec)),
+              _mm_and_si128(_mm_srli_epi32(s, 17), b5vec)),
+            _mm_and_si128(_mm_srli_epi32(s, 14), b4vec)),
+          _mm_and_si128(_mm_srli_epi32(s, 11), b3vec)),
+        _mm_and_si128(_mm_srli_epi32(s, 8), b2vec)),
+      _mm_and_si128(_mm_srli_epi32(s, 5), b1vec)),
+    _mm_and_si128(_mm_srli_epi32(s, 2), b0vec));
+
+  const __m128i sd = _mm_xor_si128(
+    _mm_xor_si128(
+      _mm_xor_si128(
+        _mm_xor_si128(
+          _mm_xor_si128(
+            _mm_xor_si128(
+              _mm_xor_si128(_mm_and_si128(_mm_srli_epi32(s, 24), b7vec),
+                            _mm_and_si128(_mm_srli_epi32(s, 21), b6vec)),
+              _mm_and_si128(_mm_srli_epi32(s, 18), b5vec)),
+            _mm_and_si128(_mm_srli_epi32(s, 15), b4vec)),
+          _mm_and_si128(_mm_srli_epi32(s, 12), b3vec)),
+        _mm_and_si128(_mm_srli_epi32(s, 9), b2vec)),
+      _mm_and_si128(_mm_srli_epi32(s, 6), b1vec)),
+    _mm_and_si128(_mm_srli_epi32(s, 3), b0vec));
+
+#if defined __AVX2__
+#pragma message("AVX2 is available")
+
+  constexpr uint32_t shla[]{ 0, 8, 16, 24 };
+  constexpr uint32_t shlb[]{ 24, 0, 8, 16 };
+  constexpr uint32_t shlc[]{ 16, 24, 0, 8 };
+  constexpr uint32_t shld[]{ 8, 16, 24, 0 };
+
+  const __m128i shla_ = _mm_load_si128((__m128i*)shla);
+  const __m128i shlb_ = _mm_load_si128((__m128i*)shlb);
+  const __m128i shlc_ = _mm_load_si128((__m128i*)shlc);
+  const __m128i shld_ = _mm_load_si128((__m128i*)shld);
+
+  auto t0 = _mm_xor_si128(_mm_sllv_epi32(sa, shla_), _mm_sllv_epi32(sb, shlb_));
+  auto t1 = _mm_xor_si128(_mm_sllv_epi32(sc, shlc_), _mm_sllv_epi32(sd, shld_));
+  const auto t2 = _mm_xor_si128(t0, t1);
+
+  _mm_store_si128((__m128i*)st->cipher, t2);
+
+#else
+
+  uint32_t sa_[4]{};
+  uint32_t sb_[4]{};
+  uint32_t sc_[4]{};
+  uint32_t sd_[4]{};
+
+  _mm_store_si128((__m128i*)sa_, sa);
+  _mm_store_si128((__m128i*)sb_, sb);
+  _mm_store_si128((__m128i*)sc_, sc);
+  _mm_store_si128((__m128i*)sd_, sd);
+
+  st->cipher[0] = (sb_[0] << 24) ^ (sc_[0] << 16) ^ (sd_[0] << 8) ^ sa_[0];
+  st->cipher[1] = (sc_[1] << 24) ^ (sd_[1] << 16) ^ (sa_[1] << 8) ^ sb_[1];
+  st->cipher[2] = (sd_[2] << 24) ^ (sa_[2] << 16) ^ (sb_[2] << 8) ^ sc_[2];
+  st->cipher[3] = (sa_[3] << 24) ^ (sb_[3] << 16) ^ (sc_[3] << 8) ^ sd_[3];
+
+#endif
+
+#else
+
   const uint32_t s0 = st->cipher[0];
   const uint32_t s1 = st->cipher[1];
   const uint32_t s2 = st->cipher[2];
@@ -258,6 +385,8 @@ perm_bits(state_t* const st)
   st->cipher[1] = (s1b3 << 24) ^ (s1b2 << 16) ^ (s1b1 << 8) ^ s1b0;
   st->cipher[2] = (s2b3 << 24) ^ (s2b2 << 16) ^ (s2b1 << 8) ^ s2b0;
   st->cipher[3] = (s3b3 << 24) ^ (s3b2 << 16) ^ (s3b1 << 8) ^ s3b0;
+
+#endif
 
 #else
 #pragma message("Compiling for non-x86_64")
