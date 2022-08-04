@@ -2,6 +2,7 @@
 
 import gift_cofb
 import numpy as np
+from random import Random, randint
 
 u8 = np.uint8
 
@@ -73,6 +74,71 @@ def test_gift_cofb_kat():
 
             # don't need this line, so discard
             fd.readline()
+
+
+def flip_bit(inp: bytes) -> bytes:
+    """
+    Randomly selects a byte offset of a given byte array ( inp ), whose single random bit
+    will be flipped. Input is **not** mutated & single bit flipped byte array is returned back.
+
+    Taken from https://github.com/itzmeanjan/elephant/blob/2a21c7e/wrapper/python/test_elephant.py#L217-L237
+    """
+    arr = bytearray(inp)
+    ilen = len(arr)
+
+    idx = randint(0, ilen - 1)
+    bidx = randint(0, 7)
+
+    mask0 = (0xFF << (bidx + 1)) & 0xFF
+    mask1 = (0xFF >> (8 - bidx)) & 0xFF
+    mask2 = 1 << bidx
+
+    msb = arr[idx] & mask0
+    lsb = arr[idx] & mask1
+    bit = (arr[idx] & mask2) >> bidx
+
+    arr[idx] = msb | ((1 - bit) << bidx) | lsb
+    return bytes(arr)
+
+
+def test_gift_cofb_auth_fail():
+    """
+    Test that GIFT-COFB authentication failure happens when random bit of associated data
+    and/ or encrypted text are flipped. Also it's ensured that in case of authentication
+    failure unverified plain text is never released, instead memory allocation for
+    decrypted plain text is explicitly zeroed.
+    """
+    rng = Random()
+
+    DLEN = 32
+    CTLEN = 64
+
+    key = rng.randbytes(16)
+    nonce = rng.randbytes(16)
+    data = rng.randbytes(DLEN)
+    txt = rng.randbytes(CTLEN)
+
+    enc, tag = gift_cofb.encrypt(key, nonce, data, txt)
+
+    # case 0
+    data_ = flip_bit(data)
+    flg, dec = gift_cofb.decrypt(key, nonce, tag, data_, enc)
+
+    assert not flg, "GIFT-COFB authentication must fail !"
+    assert bytes(CTLEN) == dec, "Unverified plain text must not be released !"
+
+    # case 1
+    enc_ = flip_bit(enc)
+    flg, dec = gift_cofb.decrypt(key, nonce, tag, data, enc_)
+
+    assert not flg, "GIFT-COFB authentication must fail !"
+    assert bytes(CTLEN) == dec, "Unverified plain text must not be released !"
+
+    # case 2
+    flg, dec = gift_cofb.decrypt(key, nonce, tag, data_, enc_)
+
+    assert not flg, "GIFT-COFB authentication must fail !"
+    assert bytes(CTLEN) == dec, "Unverified plain text must not be released !"
 
 
 if __name__ == "__main__":
