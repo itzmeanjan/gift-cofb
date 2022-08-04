@@ -541,6 +541,7 @@ decrypt(const uint8_t* const __restrict key,   // 128 -bit key
     flg |= static_cast<bool>(tag[i] ^ tag_[i]);
   }
 
+  std::memset(txt, 0, flg * ctlen);
   return !flg;
 }
 
